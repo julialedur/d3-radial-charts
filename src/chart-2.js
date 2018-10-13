@@ -22,14 +22,16 @@ var pie = d3.pie().value(function(d) {
   return d.minutes
 })
 
-var radius = 100
+var radius = 80
 
 var arc = d3
   .arc()
   .innerRadius(0)
   .outerRadius(radius)
 
-var colorScale = d3.scaleOrdinal().range(['pink', 'cyan', 'magenta', 'mauve'])
+var colorScale = d3.scaleOrdinal().range(['#fad3cf', '#a696c8', '#b1cbfa', '#757882'])
+
+var xPositionScale = d3.scalePoint().range([0, width])
 
 var tasks = ['Typing code', 'Rewriting code', 'Reading StackOverflow']
 
@@ -45,6 +47,11 @@ d3.csv(require('./data/time-breakdown-all.csv'))
   .catch(err => console.log('Failed with', err))
 
 function ready(datapoints) {
+  var projects = datapoints.map(d => d.project)
+  console.log(projects)
+
+  xPositionScale.domain(projects).padding(0.4)
+
   let nested = d3
     .nest()
     .key(d => d.project)
@@ -52,11 +59,38 @@ function ready(datapoints) {
 
   var container = svg.append('g').attr('transform', 'translate(200,200)')
 
-  container
-    .selectAll('path')
+  svg
+    .selectAll('.graph')
+    .data(nested)
     .enter()
-    .append('path')
-    .data(pie(datapoints))
-    .attr('d', d => arc(d))
-    .attr('fill', d => colorScale(d.data.task))
+    .append('g')
+    .attr('transform', function(d) {
+      console.log(d)
+      return 'translate(' + xPositionScale(d.key) + ',' + height / 2 + ')'
+    })
+    .each(function(d) {
+      console.log(d)
+      var container = d3.select(this)
+      var datapoints = d.values
+      console.log('g data looks like', datapoints)
+
+      container
+        .selectAll('path')
+        .data(pie(datapoints))
+        .enter()
+        .append('path')
+        .attr('d', function(d) {
+          return arc(d)
+        })
+        .style('fill', d => colorScale(d.data.task))
+
+      container
+        .append('text')
+        .text(d => d.key)
+        .attr('x', xPositionScale(d.projects))
+        .attr('y', height / 3)
+        .attr('font-size', 15)
+        .attr('fill', 'black')
+        .attr('text-anchor', 'middle')
+    })
 }

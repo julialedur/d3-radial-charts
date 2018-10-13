@@ -34,7 +34,7 @@ var labelArc = d3
   .innerRadius(radius)
   .outerRadius(radius + 15)
 
-var colorScale = d3.scaleOrdinal().range(['pink', 'cyan', 'magenta', 'mauve'])
+var colorScale = d3.scaleOrdinal().range(['#fad3cf', '#a696c8', '#b1cbfa'])
 
 var tasks = ['Typing code', 'Rewriting code', 'Reading StackOverflow']
 

@@ -39,6 +39,11 @@ var angleScale = d3
   .domain(months)
   .range([0, Math.PI * 2])
 
+var colorScale = d3
+  .scaleLinear()
+  .domain([38, 83])
+  .range(['#B6D5E3', '#FDC0CC'])
+
 let arc = d3
   .arc()
   .innerRadius(d => radiusScale(0))
@@ -52,7 +57,7 @@ d3.csv(require('./data/ny-temps.csv'))
 
 function ready(datapoints) {
   console.log(datapoints)
-  //datapoints.push(datapoints[0])
+  // datapoints.push(datapoints[0])
 
   let holder = svg
     .append('g')
@@ -64,6 +69,16 @@ function ready(datapoints) {
     .enter()
     .append('path')
     .attr('d', d => arc(d))
-    .attr('fill', 'purple')
-    .attr('opacity', 0.3)
+    .attr('fill', function(d) {
+      return colorScale(d.high_temp)
+    })
+    .attr('stroke', 'white')
+    .attr('stroke-width', 0.2)
+
+  holder
+    .append('circle')
+    .attr('r', 3)
+    .attr('fill', 'black')
+    .attr('cx', 0)
+    .attr('cy', 0)
 }
